@@ -1,0 +1,6 @@
+package templates.launcherbutton;
+
+public enum LauncherButtonID
+{
+    LOGIN,REGISTER,FAQ,ENTER_LOGIN_DATA,ENTER_REGISTER_DATA,IMPORT_USER,DATA_BASE_CREATION_CONFIRM
+}
