@@ -1,4 +1,4 @@
-package templates.launcherscreen.screens;
+package templates.screen.screens;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
@@ -9,30 +9,54 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import launcher.StartUp;
-import templates.launcherscreen.CurrentScreenID;
+import launcher.Launcher;
+import templates.screen.CustomScreen;
+import templates.sound.CustomSoundsID;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static launcher.StartUp.playerCurrentView;
-import static templates.launcherimage.LauncherImages.MEGA_LAUNCHER_ICON;
-
-public class OpenScreen extends LauncherPaneDesign
+import static templates.image.Images.MEGA_LAUNCHER_ICON;
+/**
+ * Screen that is loaded when the launcher start and plays an animation.
+ * */
+public class StartScreen extends CustomScreen
 {
-    private Pane launcherPane;
-    private StartUp startUp;
+    //this field is final because we are assigning only 1 value to it when we are initializing.
+    private final Pane startPane;
 
-    public OpenScreen(StartUp startUp) {
-
-        this.startUp = startUp;
-        launcherPane = new Pane();
+    /**
+     * Constructor for setting up the Screen
+     * @param launcher an instance from the main launcher class
+     * */
+    public StartScreen(Launcher launcher) {
+        startPane = new Pane();
 
         ImageView launcherLogo = new ImageView(MEGA_LAUNCHER_ICON);
         launcherLogo.setX(5);
         launcherLogo.setY(5);
-        launcherLogo.setFitWidth(503);
-        launcherLogo.setFitHeight(502);
+        launcherLogo.setFitWidth(500);
+        launcherLogo.setFitHeight(500);
+
+        Rectangle rectangleLoader1 = createRectangleNode(0 , 0);
+        Rectangle rectangleLoader2 = createRectangleNode(505 , 0);
+        Rectangle rectangleLoader3 = createRectangleNode(0 , 505);
+        Rectangle rectangleLoader4 = createRectangleNode(505 , 505);
+
+        playAnimations(launcherLogo, rectangleLoader1, rectangleLoader2, rectangleLoader3, rectangleLoader4);
+
+        startPane.setBackground(new Background(new BackgroundFill(Color.BLACK , null , null)));
+        startPane.getChildren().addAll(launcherLogo , rectangleLoader1 , rectangleLoader2 , rectangleLoader3 , rectangleLoader4);
+        launcher.getSounds().playSound(CustomSoundsID.START);
+    }
+
+    //Returns the pane that contains the screen contain and is used by the screen manager class
+    @Override public Pane getPane() {
+        return startPane;
+    }
+
+    //plays the entire animation of the bars and the logo.
+    private void playAnimations(ImageView launcherLogo, Rectangle rectangleLoader1, Rectangle rectangleLoader2, Rectangle rectangleLoader3, Rectangle rectangleLoader4) {
 
         FadeTransition launcherLogoAnimator = new FadeTransition();
         launcherLogoAnimator.setFromValue(1);
@@ -40,11 +64,6 @@ public class OpenScreen extends LauncherPaneDesign
         launcherLogoAnimator.setDuration(Duration.seconds(3.0));
         launcherLogoAnimator.setNode(launcherLogo);
         launcherLogoAnimator.play();
-
-        Rectangle rectangleLoader1 = createRectangleNode(0 , 0);
-        Rectangle rectangleLoader2 = createRectangleNode(505 , 0);
-        Rectangle rectangleLoader3 = createRectangleNode(0 , 508);
-        Rectangle rectangleLoader4 = createRectangleNode(505 , 507);
 
         ScaleTransition rectangleLoaderTransition1 = createScaleXTransition(rectangleLoader1 , 210);
         ScaleTransition rectangleLoaderTransition2 = createScaleYTransition(rectangleLoader2 , 210);
@@ -65,24 +84,9 @@ public class OpenScreen extends LauncherPaneDesign
         };
         Timer timer = new Timer();
         timer.schedule(timerTask , 3500);
-
-        launcherPane.setBackground(new Background(new BackgroundFill(Color.BLACK , null , null)));
-        launcherPane.getChildren().addAll(launcherLogo , rectangleLoader1 , rectangleLoader2 , rectangleLoader3 , rectangleLoader4);
-        startUp.getSoundHandler().playLauncherStartUp();
     }
 
-    @Override
-    public void setViewingPane() {
-        playerCurrentView = CurrentScreenID.OPEN;
-        startUp.getCurrentLauncherScene().setRoot(launcherPane);
-    }
-
-
-    @Override
-    public Pane getPane() {
-        return launcherPane;
-    }
-
+    //Helper methods for simplifying the code in the constructor method and applying the DRY principle
     private Rectangle createRectangleNode(int X , int Y) {
         Rectangle rectangle = new Rectangle();
         rectangle.setX(X);
@@ -92,7 +96,6 @@ public class OpenScreen extends LauncherPaneDesign
         rectangle.setFill(Color.valueOf("#004a7f"));
         return rectangle;
     }
-
     private ScaleTransition createScaleXTransition(Rectangle rectangle , int to) {
         ScaleTransition rectangleAnimation = new ScaleTransition();
         rectangleAnimation.setDuration(Duration.seconds(3.0));
